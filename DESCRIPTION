@@ -1,0 +1,9 @@
+Package: horno
+Type: Package
+Title: Identification of heat waves
+Version: 0.1.0
+Author: Dante Castro Garro <dante.tcg@gmail.com>
+Maintainer: Dante Castro Garro <dante.tcg@gmail.com>
+RoxygenNote: 7.2.3
+Encoding: UTF-8
+License: GPL-3
