@@ -134,7 +134,7 @@ magnitudeThresholds <- function(temperature, date, reference = c(1981, 2010)) {
     ts <- tibble(date = date, temperature = temperature) %>%
         mutate(year = year(date))
     thresholds <- ts %>%
-        filter(year %in% reference[]:reference[2]) %>%
+        filter(year %in% reference[1]:reference[2]) %>%
         group_by(year) %>%
         summarise(annual_max = max(temperature)) %>%
         ungroup() %>%
