@@ -29,8 +29,8 @@
 #' General function to find heat waves for a temperature time series. The
 #' function can be used to find cold waves as well.
 #'
-#' @param temperature (vector.numeric) Temperature records.
 #' @param date (vector.Date) Dates for each record.
+#' @param temperature (vector.numeric) Temperature records.
 #' @param reference (vector.integer) Range of years to use as reference for
 #' the thresholds calcualtions.
 #' @param type (character) Calculation for heat or cold waves.
@@ -44,28 +44,28 @@
 #' @author Dante Castro Garro
 #'
 #' @examples
-#' data(temp_ts)
-#' waves <- findWaves(temp_ts$temperature, temp_ts$date)
+#' data(t2m_hamburg)
+#' waves <- findWaves(t2m_hamburg$date, t2m_hamburg$temperature)
 #'
 #' @export
 #'
-findWaves <- function(temperature, date, reference = c(1981, 2010), type = "heat wave") {
+findWaves <- function(date, temperature, reference = c(1981, 2010), type = "heat wave") {
     ts <- tibble(date = date, temperature = temperature) %>%
         mutate(
             year = year(date),
             month = substring(as.character(date), 6, 7),
             day = substring(as.character(date), 9, 10),
             month_day = paste0(month, "-", day),
-            extreme_day = extremeDays(temperature, date),
+            extreme_day = extremeDays(date, temperature),
             wave_day = waveDays(extreme_day, date),
             wave_event = groupWaves(wave_day, date),
-            magnitude_day = dailyMagnitude(temperature, date)
+            magnitude_day = dailyMagnitude(date, temperature)
         ) %>%
         group_by(wave_event) %>%
         mutate(magnitude_event = sum(magnitude_day)) %>%
         ungroup() %>%
         mutate(magnitude_event = ifelse(is.na(wave_event), NA, magnitude_event)) %>%
-        select(date, temperature, wave_day, wave_event, magnitude_day, magnitude_event)
+        select(temperature, date, wave_day, wave_event, magnitude_day, magnitude_event)
     return(ts)
 }
 
@@ -73,8 +73,8 @@ findWaves <- function(temperature, date, reference = c(1981, 2010), type = "heat
 #'
 #' Function that calculates the dialy mangitude of heat/cold wave days
 #'
-#' @param temperature (vector.numeric) Temperature records.
 #' @param date (vector.Date) Dates for each record.
+#' @param temperature (vector.numeric) Temperature records.
 #' @param reference (vector.integer) Range of years to use as reference for
 #' the thresholds calcualtions.
 #' @param type (character) Calculation for heat or cold waves.
@@ -84,16 +84,16 @@ findWaves <- function(temperature, date, reference = c(1981, 2010), type = "heat
 #' @author Dante Castro Garro
 #'
 #' @examples
-#' data(temp_ts)
-#' waves <- dialyMagnitude(temp_ts$temperature, temp_ts$date)
+#' data(t2m_hamburg)
+#' magnitude <- dailyMagnitude(t2m_hamburg$date, t2m_hamburg$temperature)
 #'
 #' @export
 #'
-dailyMagnitude <- function(temperature, date, reference = c(1981, 2010), type = "heat wave") {
-    thresholds <- magnitudeThresholds(temperature, date, reference = c(1981, 2010))
+dailyMagnitude <- function(date, temperature, reference = c(1981, 2010), type = "heat wave") {
+    thresholds <- magnitudeThresholds(date, temperature, reference = c(1981, 2010))
     p25 <- pull(thresholds, p25)
     p75 <- pull(thresholds, p75)
-    ts <- tibble(date = date, temperature = temperature)
+    ts <- tibble(temperature = temperature, date = date)
 
     # Threshold depending on the type of event
     if (type == "heat wave") {
@@ -115,8 +115,8 @@ dailyMagnitude <- function(temperature, date, reference = c(1981, 2010), type = 
 #' Calculate the required thresholds for the daily mangitude. The thresholds
 #'  are based on the 25th and 75th percentile of annual maximum temperature.
 #'
-#' @param temperature (vector.numeric) Temperature records.
 #' @param date (vector.Date) Dates for each record.
+#' @param temperature (vector.numeric) Temperature records.
 #' @param reference (vector.integer) Range of years to use as reference for
 #' the thresholds calcualtions.
 #'
@@ -125,12 +125,12 @@ dailyMagnitude <- function(temperature, date, reference = c(1981, 2010), type = 
 #' @author Dante Castro Garro
 #'
 #' @examples
-#' data(temp_ts)
-#' waves <- dialyMagnitude(temp_ts$temperature, temp_ts$date)
+#' data(t2m_hamburg)
+#' mag_thresh <- dailyMagnitude(t2m_hamburg$date, t2m_hamburg$temperature)
 #'
 #' @export
 #'
-magnitudeThresholds <- function(temperature, date, reference = c(1981, 2010)) {
+magnitudeThresholds <- function(date, temperature, reference = c(1981, 2010)) {
     ts <- tibble(date = date, temperature = temperature) %>%
         mutate(year = year(date))
     thresholds <- ts %>%
@@ -158,10 +158,10 @@ magnitudeThresholds <- function(temperature, date, reference = c(1981, 2010)) {
 #' @author Dante Castro Garro
 #'
 #' @examples
-#' data(temp_ts)
-#' ext <- extremeDays(temp_ts$temperature, temp_ts$date)
-#' wave_day <- waveDays(ext, temp_ts$date)
-#' wave_event_id <- groupWaves(wave_day, temp_ts$date)
+#' data(t2m_hamburg)
+#' ext <- extremeDays(t2m_hamburg$date, t2m_hamburg$temperature)
+#' wave_day <- waveDays(ext, t2m_hamburg$date)
+#' wave_id <- groupWaves(wave_day, t2m_hamburg$date)
 #'
 #' @export
 #'
@@ -191,9 +191,9 @@ groupWaves <- function(wave_days, date) {
 #' @author Dante Castro Garro
 #'
 #' @examples
-#' data(temp_ts)
-#' ext <- extremeDays(temp_ts$temperature, temp_ts$date)
-#' wave_day <- waveDays(ext, temp_ts$date)
+#' data(t2m_hamburg)
+#' ext <- extremeDays(t2m_hamburg$date, t2m_hamburg$temperature)
+#' wave_day <- waveDays(ext, t2m_hamburg$date)
 #'
 #' @export
 #'
@@ -218,8 +218,8 @@ waveDays <- function(extreme_day, date) {
 #' Identification of extreme hot/cold days. An extreme day happens when the
 #'  temperature exceeds a daily threshold.
 #'
-#' @param temperature (vector.numeric) Temperature records.
 #' @param date (vector.Date) Dates for each record.
+#' @param temperature (vector.numeric) Temperature records.
 #' @param reference (vector.integer) Range of years to use as reference for
 #'  the thresholds calcualtions.
 #' @param type (character) Calculation for heat or cold waves.
@@ -231,16 +231,16 @@ waveDays <- function(extreme_day, date) {
 #' @author Dante Castro Garro
 #'
 #' @examples
-#' data(temp_ts)
-#' ext <- extremeDays(temp_ts$temperature, temp_ts$date)
+#' data(t2m_hamburg)
+#' ext <- extremeDays(t2m_hamburg$date, t2m_hamburg$temperature)
 #'
 #' @export
 #'
-extremeDays <- function(temperature, date, reference = c(1981, 2010), type = "heat wave", qthresh = NULL) {
+extremeDays <- function(date, temperature, reference = c(1981, 2010), type = "heat wave", qthresh = NULL) {
     # Calculating the daily threshold
     if (is.null(qthresh)) qthresh <- ifelse(type == "heat wave", 0.9, 0.1)
-    ts <- tibble(temperature = temperature, date = date) %>%
-        mutate(daily_threshold = dailyThreshold(temperature, date, reference, qthresh))
+    ts <- tibble(date = date, temperature = temperature) %>%
+        mutate(daily_threshold = dailyThreshold(date, temperature, reference, qthresh))
 
     # Identification of the extreme days
     if (type == "heat wave") {
@@ -259,8 +259,8 @@ extremeDays <- function(temperature, date, reference = c(1981, 2010), type = "he
 #' Calculate the calendar thresholds based on a quantile for a 31-day-centered
 #'  window in the reference period.
 #'
-#' @param temperature (vector.numeric) Temperature records.
 #' @param date (vector.Date) Dates for each record.
+#' @param temperature (vector.numeric) Temperature records.
 #' @param reference (vector.integer) Range of years to use as reference for
 #'  the thresholds calcualtions.
 #' @param qthresh (numeric) Quantile to be used as threshold. If not defined,
@@ -271,14 +271,14 @@ extremeDays <- function(temperature, date, reference = c(1981, 2010), type = "he
 #' @author Dante Castro Garro
 #'
 #' @examples
-#' data(temp_ts)
-#' ext <- dailyThreshold(temp_ts$temperature, temp_ts$date)
+#' data(t2m_hamburg)
+#' day_thresh <- dailyThreshold(t2m_hamburg$date, t2m_hamburg$temperature)
 #'
 #' @export
 #'
-dailyThreshold <- function(temperature, date, reference = c(1981, 2010), qthresh = 0.9) {
+dailyThreshold <- function(date, temperature, reference = c(1981, 2010), qthresh = 0.9) {
     # Time series as a table with the date splitted
-    ts <- tibble(temperature = temperature, date = date) %>%
+    ts <- tibble(date = date, temperature = temperature) %>%
         mutate(
             year = year(date),
             month_day = substring(as.character(date), 6, 10)
