@@ -41,6 +41,9 @@
 #' (numeric) daily magnitude. magnitude_event (numeric) total magntiude for
 #' each wave event.
 #'
+#' @import dplyr
+#' @importFrom lubridate year
+#'
 #' @author Dante Castro Garro
 #'
 #' @examples
@@ -80,6 +83,8 @@ findWaves <- function(date, temperature, reference = c(1981, 2010), type = "heat
 #' @param type (character) Calculation for heat or cold waves.
 #'
 #' @return (vector.numeric) Daily magntiude
+#'
+#' @import dplyr
 #'
 #' @author Dante Castro Garro
 #'
@@ -121,6 +126,9 @@ dailyMagnitude <- function(date, temperature, reference = c(1981, 2010), type = 
 #' the thresholds calcualtions.
 #'
 #' @return (dataframe) 25th and 75th percentiles as data.frame
+#'
+#' @import dplyr
+#' @importFrom lubridate year
 #'
 #' @author Dante Castro Garro
 #'
@@ -228,6 +236,8 @@ waveDays <- function(extreme_day, date) {
 #'
 #' @return (vector.bool) is it a extreme hot or cold day?
 #'
+#' @import dplyr
+#'
 #' @author Dante Castro Garro
 #'
 #' @examples
@@ -267,6 +277,9 @@ extremeDays <- function(date, temperature, reference = c(1981, 2010), type = "he
 #'  a default value (0.9 or 0.1) will be used based on the `type` parameter.
 #'
 #' @return (vector.numeric) threshold for each calendar day
+#'
+#' @import dplyr
+#' @importFrom lubridate year
 #'
 #' @author Dante Castro Garro
 #'

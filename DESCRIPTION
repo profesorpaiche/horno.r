@@ -4,6 +4,11 @@ Title: Identification of heat waves
 Version: 0.1.0
 Author: Dante Castro Garro <dante.tcg@gmail.com>
 Maintainer: Dante Castro Garro <dante.tcg@gmail.com>
+Description: Set of functions to identify heat waves and their mangitude
+    following the methodologie proposed by Russo et. al. 2014.
+Imports:
+    dplyr,
+    lubridate
 RoxygenNote: 7.2.3
 Encoding: UTF-8
 License: GPL-3
