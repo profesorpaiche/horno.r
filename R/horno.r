@@ -302,7 +302,9 @@ dailyThreshold <- function(date, temperature, reference = c(1981, 2010), qthresh
     month_day <- unique(ts$month_day)
     nmd <- length(month_day)
     day_thresh <- data.frame(month_day = month_day, threshold = NA)
-    for (md in 1:nmd){
+    
+    for (md in 1:nmd) {
+        if (month_day[md] == "02-29") next
         dummy_date <- as.Date(paste0("2001-", month_day[md]), format = "%Y-%m-%d")
         window <- seq.Date(dummy_date - hsw, dummy_date + hsw, by = 1) %>%
             substring(6, 10)
@@ -310,6 +312,13 @@ dailyThreshold <- function(date, temperature, reference = c(1981, 2010), qthresh
             filter(year %in% reference[1]:reference[2]) %>%
             filter(month_day %in% window)
         day_thresh$threshold[md] <- quantile(ts_windowed$temperature, qthresh)
+    }
+
+    # Completing February 29 if present
+    if (any(month_day == "02-29")) {
+        new_thresh <- day_thresh %>% filter(month_day %in% c("02-28", "03-01")) %>% pull(threshold)
+        new_thresh <- mean(new_thresh)
+        day_thresh$threshold[day_thresh$month_day == "02-29"] <- new_thresh
     }
 
     # Combining threshold with original data
