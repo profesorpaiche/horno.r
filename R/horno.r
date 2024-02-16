@@ -52,17 +52,18 @@
 #'
 #' @export
 #'
-findWaves <- function(date, temperature, reference = c(1981, 2010), type = "heat wave") {
+findWaves <- function(date, temperature, reference = c(1981, 2010), type = "heat wave", qthresh = NULL) {
+    if (is.null(qthresh)) qthresh <- ifelse(type == "heat wave", 0.9, 0.1)
     ts <- tibble(date = date, temperature = temperature) %>%
         mutate(
             year = year(date),
             month = substring(as.character(date), 6, 7),
             day = substring(as.character(date), 9, 10),
             month_day = paste0(month, "-", day),
-            extreme_day = extremeDays(date, temperature),
+            extreme_day = extremeDays(date, temperature, reference, type, qthresh),
             wave_day = waveDays(extreme_day, date),
             wave_event = groupWaves(wave_day, date),
-            magnitude_day = dailyMagnitude(date, temperature)
+            magnitude_day = dailyMagnitude(date, temperature, reference, type)
         ) %>%
         group_by(wave_event) %>%
         mutate(magnitude_event = sum(magnitude_day)) %>%
@@ -95,7 +96,7 @@ findWaves <- function(date, temperature, reference = c(1981, 2010), type = "heat
 #' @export
 #'
 dailyMagnitude <- function(date, temperature, reference = c(1981, 2010), type = "heat wave") {
-    thresholds <- magnitudeThresholds(date, temperature, reference = c(1981, 2010))
+    thresholds <- magnitudeThresholds(date, temperature, reference = reference)
     p25 <- pull(thresholds, p25)
     p75 <- pull(thresholds, p75)
     ts <- tibble(temperature = temperature, date = date)
@@ -246,9 +247,8 @@ waveDays <- function(extreme_day, date) {
 #'
 #' @export
 #'
-extremeDays <- function(date, temperature, reference = c(1981, 2010), type = "heat wave", qthresh = NULL) {
+extremeDays <- function(date, temperature, reference = c(1981, 2010), type = "heat wave", qthresh = 0.9) {
     # Calculating the daily threshold
-    if (is.null(qthresh)) qthresh <- ifelse(type == "heat wave", 0.9, 0.1)
     ts <- tibble(date = date, temperature = temperature) %>%
         mutate(daily_threshold = dailyThreshold(date, temperature, reference, qthresh))
 
