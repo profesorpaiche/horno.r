@@ -96,7 +96,7 @@ findWaves <- function(date, temperature, reference = c(1981, 2010), type = "heat
 #' @export
 #'
 dailyMagnitude <- function(date, temperature, reference = c(1981, 2010), type = "heat wave") {
-    thresholds <- magnitudeThresholds(date, temperature, reference = c(1981, 2010))
+    thresholds <- magnitudeThresholds(date, temperature, reference = reference)
     p25 <- pull(thresholds, p25)
     p75 <- pull(thresholds, p75)
     ts <- tibble(temperature = temperature, date = date)
