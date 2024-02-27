@@ -1,7 +1,7 @@
 Package: horno
 Type: Package
 Title: Identification of heat waves
-Version: 0.1.0
+Version: 0.1.2
 Author: Dante Castro Garro <dante.tcg@gmail.com>
 Maintainer: Dante Castro Garro <dante.tcg@gmail.com>
 Description: Set of functions to identify heat waves and their mangitude
