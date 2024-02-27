@@ -9,7 +9,7 @@ hand, is calculated as the difference between the daily temperature and the
 
 ## Install
 
-```{r}
+```
 library(devtools)
 install_github("profesorpaiche/horno.r")
 ```
@@ -19,7 +19,7 @@ install_github("profesorpaiche/horno.r")
 The simplest way to identify heatwaves is having a data frame with daily
 temperature and call the `findWaves` function.
 
-```{r}
+```
 data(t2m_hamburg)
 heatwaves <- findWaves(t2m_hamburg$date, t2m_hamburg$temperature)
 ```
@@ -37,7 +37,7 @@ the same sense, you can change the threshold used to identify the heat wave
 days (0.9 by default), or even use the function to find "cold waves" using the
 same methodology.
 
-```{r}
+```
 # Using the reference period of 1971-2000 and a quantile threshold of 0.95 (more strict)
 heatwaves <- findWaves(
     t2m_hamburg$date,
@@ -47,7 +47,7 @@ heatwaves <- findWaves(
 )
 ```
 
-```{r}
+```
 data(t2m_hamburg)
 coldwaves <- findWaves(t2m_hamburg$date, t2m_hamburg$temperature, type = "cold wave")
 ```
