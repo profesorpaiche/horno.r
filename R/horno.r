@@ -148,8 +148,8 @@ magnitudeThresholds <- function(date, temperature, reference = c(1981, 2010)) {
         summarise(annual_max = max(temperature)) %>%
         ungroup() %>%
         summarize(
-            p25 = quantile(annual_max, 0.25),
-            p75 = quantile(annual_max, 0.75)
+            p25 = quantile(annual_max, 0.25, na.rm = TRUE),
+            p75 = quantile(annual_max, 0.75, na.rm = TRUE)
         )
     return(thresholds)
 }
@@ -311,7 +311,7 @@ dailyThreshold <- function(date, temperature, reference = c(1981, 2010), qthresh
         ts_windowed <- ts %>%
             filter(year %in% reference[1]:reference[2]) %>%
             filter(month_day %in% window)
-        day_thresh$threshold[md] <- quantile(ts_windowed$temperature, qthresh)
+        day_thresh$threshold[md] <- quantile(ts_windowed$temperature, qthresh, na.rm = TRUE)
     }
 
     # Completing February 29 if present
